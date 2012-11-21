@@ -4282,6 +4282,7 @@ skip_chunk:
 					screen->cursor_current.row);
 
 			/* Insert the character. */
+      g_signal_emit_by_name(terminal, "ktuan-text-append", c);
 			if (G_UNLIKELY (_vte_terminal_insert_char(terminal, c,
 						 FALSE, FALSE))) {
 				/* line wrapped, correct bbox */
@@ -4488,6 +4489,13 @@ _vte_terminal_feed_chunks (VteTerminal *terminal, struct _vte_incoming_chunk *ch
 			_vte_incoming_chunks_length(chunks),
 			_vte_incoming_chunks_count(chunks));
 
+  for (last = chunks; last != NULL; last = last->next) {
+    int i;
+    for (i = 0; i < last->len; ++i) {
+      fprintf(stderr, "chunks: %d\n", last->data[i]);
+    }
+  }
+
 	for (last = chunks; last->next != NULL; last = last->next) ;
 	last->next = terminal->pvt->incoming;
 	terminal->pvt->incoming = chunks;
@@ -4498,6 +4506,7 @@ vte_terminal_io_read(GIOChannel *channel,
 		     GIOCondition condition,
 		     VteTerminal *terminal)
 {
+  fprintf(stderr, "vte_terminal_io_read\n");
 	int err = 0;
 	gboolean eof, again = TRUE;
 
@@ -4543,6 +4552,12 @@ vte_terminal_io_read(GIOChannel *channel,
 			len = 0;
 			do {
 				int ret = read (fd, bp, rem);
+        {
+          int i;
+          for (i = 0; i < ret; ++i) {
+            fprintf(stderr, "read char %d", bp[i]);
+          }
+        }
 				switch (ret){
 					case -1:
 						err = errno;
@@ -12335,6 +12350,18 @@ vte_terminal_class_init(VteTerminalClass *klass)
 			     NULL,
                              g_cclosure_marshal_VOID__INT,
 			     G_TYPE_NONE, 1, G_TYPE_INT);
+
+        /**
+         * ktuan-text-append
+         */
+                g_signal_new(I_("ktuan-text-append"),
+           G_OBJECT_CLASS_TYPE(klass),
+           G_SIGNAL_RUN_LAST,
+           G_STRUCT_OFFSET(VteTerminalClass, text_scrolled),
+           NULL,
+           NULL,
+                             g_cclosure_marshal_VOID__INT,
+           G_TYPE_NONE, 1, G_TYPE_INT);
 
 #undef OBSOLETE_SIGNAL
 

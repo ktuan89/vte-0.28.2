@@ -1017,7 +1017,7 @@ main(int argc, char **argv)
 				g_warning("Failed to fork: %s\n", err->message);
 				g_error_free(err);
 			} else {
-				g_print("Fork haha succeeded, PID %d\n", pid);
+				g_print("Fork succeeded, PID %d\n", pid);
 			}
 
 			g_strfreev(command_argv);
@@ -1090,10 +1090,6 @@ main(int argc, char **argv)
 #endif
 
 	gtk_widget_show_all(window);
-
-  void *y = vte_terminal_accessible_factory_new();
-  void *x = atk_object_factory_create_accessible(y, terminal);
-  fprintf(stderr, "2 cai: %d %d", (int) x, (int) terminal);
 
 	gtk_main();
 

@@ -1201,6 +1201,7 @@ vte_sequence_handler_cm (VteTerminal *terminal, GValueArray *params)
 static void
 vte_sequence_handler_cr (VteTerminal *terminal, GValueArray *params)
 {
+  g_signal_emit_by_name(terminal, "ktuan-text-append", 10);
 	terminal->pvt->screen->cursor_current.col = 0;
 }
 
